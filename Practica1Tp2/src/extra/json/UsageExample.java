@@ -7,7 +7,7 @@ import java.io.FileNotFoundException;
 import org.json.*;
 
 public class UsageExample {
-
+//cambii de ijfajs
 	/**
 	 * Accessing the elements of a JSONObject.
 	 */
