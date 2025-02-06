@@ -7,7 +7,7 @@ import java.util.List;
 import org.json.JSONObject;
 
 public class Vehicle extends SimulatedObject {
-	private List<Junction> itinerary; // junction representa los curces y se define ahi
+	private List<Junction> itinerary; // junction representa los cruces y se define ahi
 	private int maxSpeed;
 	private int actSpeed;
 	private VehicleStatus estado;
@@ -34,15 +34,30 @@ public class Vehicle extends SimulatedObject {
 		this.actSpeed = Math.min(s,maxSpeed); // En vez de importar la libreria la hemos llamado desde la funcion directamente
 	}
 	void setContaminationClass(int c) {
-		this.
+		if(c < 0  || c > 0) throw new IllegalArgumentException("El nivel de contaminación no entra en el rango de valores");
+		this.contClass = c;
 	}
 	@Override
 
-	void advance(int time) {
-		// TODO Auto-generated method stub
-
+	void advance(int time){//avanza el numero de tics
+		int i = 0;
+		while(this.estado == VehicleStatus.TRAVELING || i < time )
+		{
+			int Nuevalocalizacion =  Math.min(actSpeed+this.localizacion, road.length)//(hay que implementar el guetter);
+			this.ContamT += this.contClass * (Nuevalocalizacion-this.localizacion);
+			this.localizacion = Nuevalocalizacion;
+			if(this.localizacion == road.lenght)//hay que implementarlo
+			{
+				//se llama a junction porque el vehiculo entra a la cola del cruce
+				//se modifica el estado del vehiculo
+			}
+			i++;
+		}
 	}
 
+	void moveToNextRoad() {
+		
+	}
 	@Override
 	public JSONObject report() {
 		// TODO Auto-generated method stub
