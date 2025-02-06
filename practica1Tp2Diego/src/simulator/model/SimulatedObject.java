@@ -7,7 +7,7 @@ public abstract class SimulatedObject {
 	protected String _id;
 
 	SimulatedObject(String id) {
-		if ( id == null || id.isBlank() )
+		if (id == null || id.isBlank())
 			throw new IllegalArgumentException("the 'id' must be a nonempty string.");
 		else
 			_id = id;
@@ -22,7 +22,7 @@ public abstract class SimulatedObject {
 		return _id;
 	}
 
-	abstract void advance(int time);
+	abstract void advance(int currTime);
 
 	abstract public JSONObject report();
 }

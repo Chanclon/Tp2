@@ -81,7 +81,6 @@ public class Main {
 		_outFile = line.getOptionValue("o");
 	}
 
-
 	private static void initFactories() {
 	}
 

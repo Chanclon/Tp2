@@ -1,5 +1,147 @@
 package simulator.model;
 
-public class Road extends SimulatedObject{
+import java.util.Collections;
+import java.util.List;
 
+import org.json.JSONObject;
+
+public abstract class Road extends SimulatedObject{
+
+	private Junction srcJunc;
+	private Junction destJunc;
+	private int length;
+	private int maxSpeed;
+	private int limitSpeed;
+	private int contLimit;
+	private Weather weather;
+	private int contT;
+	private List<Vehicle> vehicles; //Ordenada por la localizacion de los vehiculos (descendente)
+	
+	//Getters: /////////////////////
+	
+	public int getLength() {
+		return length;
+	}
+	
+	public Junction getDest() {
+		return destJunc;
+	}
+	
+	public Junction getSrc() {
+		return srcJunc;
+	}
+	
+	public Weather getWeather() {
+		return weather;
+	}
+	
+	public int getContLimit() {
+		return contLimit;
+	}
+	
+	public int getMaxSpeed() {
+		return maxSpeed;
+	}
+	
+	public int getTotalCO2() {
+		return contT;
+	}
+	
+	public int getSpeedLimit() {
+		return limitSpeed;
+	}
+	
+	public List<Vehicle> getVehicles(){
+		//Hay que usar esta funcion pero no se si es asi
+		return Collections.unmodifiableList(vehicles);
+	}
+	
+	///////////////////////////////
+	
+	//Setters: ////////////////////
+	
+	protected void setContT(int tc) {
+		this.contT = tc;
+	}
+	
+	protected void SetSpeedLimit(int s) {
+		this.limitSpeed = s;
+	}
+	
+	protected void SetVehicleSpeed() {
+		
+	}
+	///////////////////////////////
+	
+	protected Road(String id, Junction srcJunc, Junction destJunc, int maxSpeed, int contLimit, int length, Weather weather) {
+		super(id);
+		if(srcJunc == null || destJunc == null || weather == null || maxSpeed <= 0 || contLimit < 0 || length <= 0) {
+			throw new IllegalArgumentException("El/Los Valores no son validos");
+		}
+		else {
+			this.srcJunc = srcJunc;
+			this.destJunc = destJunc;
+			this.maxSpeed = maxSpeed;
+			this.contLimit = contLimit;
+			this.length = length;
+			this.weather = weather;			
+		}
+	}
+	
+	public void enter(Vehicle v) {
+		if(v.localización() != 0 && v.actSpeed() != 0)
+			throw new IllegalArgumentException();
+		vehicles.add(v);
+		//Para ordenar la lista de vehiculos 
+		Collections.sort(vehicles, Comparator);
+	}
+	
+	public void exit(Vehicle v) {
+		vehicles.remove(v);
+	}
+	
+	public void setWeather(Weather w) {
+		if(w == null)
+			throw new IllegalArgumentException("Weather no puede ser null");
+		this.weather = w;
+	}
+	
+	public void addContamination(int c) {
+		if(c < 0)
+			throw new IllegalArgumentException("La contaminacion no puede ser negativa");
+		this.contT += c;
+	}
+	
+	//Reduce el total de la contaminacion y se definirá en las subclases de road
+	abstract void reduceTotalContamination();
+	
+	//Actualiza la velocidad limite de la carretera y se definira en las subclases de road
+	abstract void updateSpeedLimit();
+	
+	//Calcula la posicion de un vehiculo y se definira en las subclases de road
+	abstract int calculateVehicleSpeed(Vehicle v);
+		
+	@Override
+	void advance(int currTime) {
+		for(int i = 0; i < currTime; i++) {
+			//Reduce la contaminacion total
+			reduceTotalContamination();
+			//Establece el limite de velocidad
+			updateSpeedLimit();
+			//Recorre la lista de vehiculos
+			for(int j = 0; j < vehicles.size(); j++) {
+				//pone la velocidad del vehı́culo
+				vehicles.get(j).setSpeed(calculateVehicleSpeed(vehicles.get(j)));
+				//Llamamos al metodo advance
+				vehicles.get(j).advance(currTime);
+			}
+		}
+		Collections.sort(vehicles, Comparator);
+	}
+
+	@Override
+	public JSONObject report() {
+		// TODO Auto-generated method stub
+		return null;
+	}		
 }
