@@ -64,11 +64,11 @@ public abstract class Road extends SimulatedObject{
 		this.contT = tc;
 	}
 	
-	protected void SetSpeedLimit(int s) {
+	protected void setSpeedLimit(int s) {
 		this.limitSpeed = s;
 	}
 	
-	protected void SetVehicleSpeed() {
+	protected void setVehicleSpeed() {
 		
 	}
 	///////////////////////////////
@@ -89,15 +89,15 @@ public abstract class Road extends SimulatedObject{
 	}
 	
 	public void enter(Vehicle v) {
-		if(v.localización() != 0 && v.actSpeed() != 0)
-			throw new IllegalArgumentException();
+		if(v.getLoc() != 0 && v.getActSpeed() != 0)
+			throw new IllegalArgumentException("El/Los valores no son validos");
 		vehicles.add(v);
 		//Para ordenar la lista de vehiculos 
 		Collections.sort(vehicles, Comparator);
 	}
 	
 	public void exit(Vehicle v) {
-		vehicles.remove(v);
+		this.vehicles.remove(v);
 	}
 	
 	public void setWeather(Weather w) {
@@ -129,6 +129,13 @@ public abstract class Road extends SimulatedObject{
 			//Establece el limite de velocidad
 			updateSpeedLimit();
 			//Recorre la lista de vehiculos
+			for(Vehicle e: vehicles) {
+				calculateVehicleSpeed(e);
+				e.advance(currTime);
+			}
+			
+			
+			
 			for(int j = 0; j < vehicles.size(); j++) {
 				//pone la velocidad del vehı́culo
 				vehicles.get(j).setSpeed(calculateVehicleSpeed(vehicles.get(j)));
@@ -136,12 +143,17 @@ public abstract class Road extends SimulatedObject{
 				vehicles.get(j).advance(currTime);
 			}
 		}
+		//Ordena el array en funcion de la posicion del vehicuo
 		Collections.sort(vehicles, Comparator);
 	}
 
 	@Override
 	public JSONObject report() {
-		// TODO Auto-generated method stub
-		return null;
+		JSONObject jo = new JSONObject();
+		jo.put("id", _id);
+		jo.put("speedLimit", maxSpeed);
+		jo.put("co2", contT);
+		jo.put("vehicles", vehicles);
+		return jo;
 	}		
 }

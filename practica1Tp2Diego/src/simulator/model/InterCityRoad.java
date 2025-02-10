@@ -12,37 +12,46 @@ public class InterCityRoad extends Road{
 		int x = 0;
 		switch(getWeather()) {
 		
-		case SUNNY: x = 2; 
+		//case Weather.SUNNY: x = 2; 
+		//break;
+		case Weather.CLOUDY: x = 3;
 		break;
 		
-		case CLOUDY: x = 3;
+		case Weather.RAINY: x = 10;
 		break;
 		
-		case RAINY: x = 10;
+		case Weather.WINDY: x = 15;
 		break;
 		
-		case WINDY: x = 15;
-		break;
-		
-		case STORM: x = 20;
+		case Weather.STORM: x = 20;
 		break;	
-		
-		//Falta el default
-		
+		//El defaut es el SUNNY 
+		default: x = 2;
+		break;	
 		}
 		int c = ((100 - x)*getTotalCO2())/100;
 		setContT(c);
 	}
 
 	@Override
-	public void updateSpeedLimit() {
-		
+	public void updateSpeedLimit() {		
+		if(getTotalCO2() > getContLimit()) {
+			int v = getMaxSpeed()/2;
+			setSpeedLimit(v);
+		}
+		else setSpeedLimit(getMaxSpeed());
 	}
 
 	@Override
 	public int calculateVehicleSpeed(Vehicle v) {
-		
-		return 0;
+		if(getWeather() != Weather.STORM) {
+			v.setSpeed(getMaxSpeed());
+		}
+		else {
+			int s =(v.getMaxSpeed()*8)/10;
+			v.setSpeed(s);
+		}
+		return v.getActSpeed();
 	}
 
 	
