@@ -33,6 +33,14 @@ public class Vehicle extends SimulatedObject {
 
 		this.actSpeed = Math.min(s,maxSpeed); // En vez de importar la libreria la hemos llamado desde la funcion directamente
 	}
+	
+	int getSpeed() {
+		return this.actSpeed;
+	}
+	
+	int getPos() {
+		return this.localizacion;
+	}
 	void setContaminationClass(int c) {
 		if(c < 0  || c > 0) throw new IllegalArgumentException("El nivel de contaminación no entra en el rango de valores");
 		this.contClass = c;
@@ -43,7 +51,7 @@ public class Vehicle extends SimulatedObject {
 		int i = 0;
 		while(this.estado == VehicleStatus.TRAVELING || i < time )
 		{
-			int Nuevalocalizacion =  Math.min(actSpeed+this.localizacion, road.length)//(hay que implementar el guetter);
+			int Nuevalocalizacion =  Math.min(actSpeed+this.localizacion, road.length);//(hay que implementar el guetter);
 			this.ContamT += this.contClass * (Nuevalocalizacion-this.localizacion);
 			this.localizacion = Nuevalocalizacion;
 			if(this.localizacion == road.lenght)//hay que implementarlo
