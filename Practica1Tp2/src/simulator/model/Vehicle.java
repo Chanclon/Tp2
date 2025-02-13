@@ -17,7 +17,7 @@ public class Vehicle extends SimulatedObject {
 	private int ContamT;
 	private int DistT;
 
-	protected Vehicle(String id, int maxSpeed, int contClass, List<Junciont> itinerary) {
+	protected Vehicle(String id, int maxSpeed, int contClass, List<Junction> itinerary) {
 		super(id);
 		if (maxSpeed < 0 || contClass < 0 || contClass > 10 || itinerary.lenght() < 2) {
 			throw new IllegalArgumentException("El/Los Valores no son validos");
@@ -51,10 +51,10 @@ public class Vehicle extends SimulatedObject {
 		int i = 0;
 		while(this.estado == VehicleStatus.TRAVELING || i < time )
 		{
-			int Nuevalocalizacion =  Math.min(actSpeed+this.localizacion, road.length);//(hay que implementar el guetter);
+			int Nuevalocalizacion =  Math.min(actSpeed+this.localizacion, road.getLength());//(hay que implementar el guetter);
 			this.ContamT += this.contClass * (Nuevalocalizacion-this.localizacion);
 			this.localizacion = Nuevalocalizacion;
-			if(this.localizacion == road.lenght)//hay que implementarlo
+			if(this.localizacion == road.getLength())//hay que implementarlo
 			{
 				//se llama a junction porque el vehiculo entra a la cola del cruce
 				//se modifica el estado del vehiculo
@@ -62,7 +62,10 @@ public class Vehicle extends SimulatedObject {
 			i++;
 		}
 	}
-
+	public int getContClass() {
+		return this.contClass;
+	}
+	
 	void moveToNextRoad() {
 		
 	}

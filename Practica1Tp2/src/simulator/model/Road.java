@@ -35,7 +35,7 @@ public abstract class Road extends SimulatedObject {
 	void enter(Vehicle v) {
 		if(v.getSpeed() != 0 && v.getPos() != 0) throw new IllegalArgumentException("El/Los Valores no son validos");
 		this.vehiculos.add(v);
-		Collections.sort(vehiculos,Comparator);
+		Collections.sort(vehiculos,new Vehiclecomparator());
 	}
 
 	void exit(Vehicle v) {
@@ -67,7 +67,7 @@ public abstract class Road extends SimulatedObject {
 				calculateVehicleSpeed(e);
 				e.advance(time);
 			}
-			Collections.sort(vehiculos,Comparator); //sirve para ordenar el array en funcion de la posicion del vegiuclo
+			Collections.sort(vehiculos,new Vehiclecomparator()); //sirve para ordenar el array en funcion de la posicion del vegiuclo
 
 		}
 	}
@@ -81,5 +81,59 @@ public abstract class Road extends SimulatedObject {
 	jo.put("vehicles",vehiculos); // no se si esto esttá bien
 		return jo ;
 	}
+	//Getters: /////////////////////
+	
+		public int getLength() {
+			return length;
+		}
+		
+		public Junction getDest() {
+			return destJunc;
+		}
+		
+		public Junction getSrc() {
+			return srcJunc;
+		}
+		
+		public Weather getWeather() {
+			return weather;
+		}
+		
+		public int getContLimit() {
+			return contLimit;
+		}
+		
+		public int getMaxSpeed() {
+			return maxSpeed;
+		}
+		
+		public int getTotalCO2() {
+			return contamT;
+		}
+		
+		public int getSpeedLimit() {
+			return limiteV;
+		}
+		
+		public List<Vehicle> getVehicles(){
+			//Hay que usar esta funcion pero no se si es asi
+			return Collections.unmodifiableList(vehiculos);
+		}
+		
+		///////////////////////////////
+		
+		//Setters: ////////////////////
+		
+		protected void setContT(int tc) {
+			this.contamT = tc;
+		}
+		
+		protected void setSpeedLimit(int s) {
+			this.limiteV = s;
+		}
+		
+		protected void setVehicleSpeed() {
+			
+		}
 
 }
