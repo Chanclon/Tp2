@@ -93,7 +93,7 @@ public abstract class Road extends SimulatedObject{
 			throw new IllegalArgumentException("El/Los valores no son validos");
 		vehicles.add(v);
 		//Para ordenar la lista de vehiculos 
-		Collections.sort(vehicles, Comparator);
+		Collections.sort(vehicles, new VehicleComparator());
 	}
 	
 	public void exit(Vehicle v) {
@@ -144,7 +144,7 @@ public abstract class Road extends SimulatedObject{
 			}
 		}
 		//Ordena el array en funcion de la posicion del vehicuo
-		Collections.sort(vehicles, Comparator);
+		Collections.sort(vehicles, new VehicleComparator());
 	}
 
 	@Override

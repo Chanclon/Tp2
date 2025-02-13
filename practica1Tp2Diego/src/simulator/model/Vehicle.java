@@ -48,7 +48,7 @@ public class Vehicle extends SimulatedObject {
 		return this.itinerary;
 	}
 	
-	public road getRoad() {
+	public Road getRoad() {
 		return this.road;
 	}
 	
