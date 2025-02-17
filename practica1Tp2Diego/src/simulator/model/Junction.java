@@ -2,6 +2,7 @@ package simulator.model;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONObject;
 
@@ -9,6 +10,8 @@ public class Junction extends SimulatedObject{
 
 	private List<Road> roads;
 	private List<List<Vehicle>> vehiclesInRoad;
+	//No se si es obligatorio o para que sirve
+	//private Map<Road, List<Vehicle>> listVehiclesMap;
 	private int currGreen;
 	private int prevGreen;
 	private LightSwitchingStrategy lsStrategy;

@@ -78,7 +78,7 @@ public class Vehicle extends SimulatedObject {
 	
 	public Vehicle(String id, int maxSpeed, int contClass, List<Junction> itinerary) {
 		super(id);
-		if (maxSpeed < 0 || contClass < 0 || contClass > 0 || itinerary.length() < 2) {
+		if (maxSpeed < 0 || contClass < 0 || contClass > 0 || itinerary.size() < 2) {
 			throw new IllegalArgumentException("El/Los valores no son validos");
 		}
 
