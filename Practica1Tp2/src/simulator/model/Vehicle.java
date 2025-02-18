@@ -23,52 +23,78 @@ public class Vehicle extends SimulatedObject {
 			throw new IllegalArgumentException("El/Los Valores no son validos");
 		}
 		this.maxSpeed = maxSpeed;
-		this._id = id ;
+		this._id = id;
 		this.contClass = contClass;
-		this.itinerary = Collections.unmodifiableList(new ArrayList<>(itinerary));		
+		this.itinerary = Collections.unmodifiableList(new ArrayList<>(itinerary));
 	}
 
-	void setSpeed(int s) {
-		if(s < 0) throw new IllegalArgumentException("La velocidad tiene que ser igual o mayor que 0");
+	public void setSpeed(int s) {
+		if (s < 0)
+			throw new IllegalArgumentException("La velocidad tiene que ser igual o mayor que 0");
 
-		this.actSpeed = Math.min(s,maxSpeed); // En vez de importar la libreria la hemos llamado desde la funcion directamente
+		this.actSpeed = Math.min(s, maxSpeed); // En vez de importar la libreria la hemos llamado desde la funcion
+												// directamente
 	}
-	
-	int getSpeed() {
+
+	public VehicleStatus getStatus() {
+		return this.estado;
+	}
+
+	public int getSpeed() {
 		return this.actSpeed;
 	}
-	
-	int getPos() {
+
+	public int getPos() {
 		return this.localizacion;
 	}
-	void setContaminationClass(int c) {
-		if(c < 0  || c > 0) throw new IllegalArgumentException("El nivel de contaminación no entra en el rango de valores");
+
+	public void setContaminationClass(int c) {
+		if (c < 0 || c > 0)
+			throw new IllegalArgumentException("El nivel de contaminación no entra en el rango de valores");
 		this.contClass = c;
 	}
+
 	@Override
 
-	void advance(int time){//avanza el numero de tics
+	public void advance(int time) {// avanza el numero de tics
 		int i = 0;
-		while(this.estado == VehicleStatus.TRAVELING || i < time )
-		{
-			int Nuevalocalizacion =  Math.min(actSpeed+this.localizacion, road.getLength());//(hay que implementar el guetter);
-			this.ContamT += this.contClass * (Nuevalocalizacion-this.localizacion);
+		while (this.estado == VehicleStatus.TRAVELING || i < time) {
+			int Nuevalocalizacion = Math.min(actSpeed + this.localizacion, road.getLength());// (hay que implementar el
+																								// guetter);
+			this.ContamT += this.contClass * (Nuevalocalizacion - this.localizacion);
 			this.localizacion = Nuevalocalizacion;
-			if(this.localizacion == road.getLength())//hay que implementarlo
+			if (this.localizacion == road.getLength())// hay que implementarlo
 			{
-				//se llama a junction porque el vehiculo entra a la cola del cruce
-				//se modifica el estado del vehiculo
+				// se llama a junction porque el vehiculo entra a la cola del cruce
+				// se modifica el estado del vehiculo
 			}
 			i++;
 		}
 	}
+
 	public int getContClass() {
 		return this.contClass;
 	}
-	
-	void moveToNextRoad() {
-		
+
+	public List<Junction> getItinerary() {
+		return this.itinerary;
 	}
+
+	public int getTotalCO2() {
+		return this.ContamT;
+	}
+	public int getMaxSpeed() {
+		return this.maxSpeed;
+	}
+
+	public Road getroad() {
+		return this.road;
+	}
+
+	void moveToNextRoad() {
+
+	}
+
 	@Override
 	public JSONObject report() {
 		// TODO Auto-generated method stub
