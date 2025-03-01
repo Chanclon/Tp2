@@ -1,5 +1,6 @@
 package simulator.model;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -78,18 +79,20 @@ public abstract class Road extends SimulatedObject{
 		if(srcJunc == null || destJunc == null || weather == null || maxSpeed <= 0 || contLimit < 0 || length <= 0) {
 			throw new IllegalArgumentException("El/Los Valores no son validos");
 		}
-		else {
 			this.srcJunc = srcJunc;
 			this.destJunc = destJunc;
 			this.maxSpeed = maxSpeed;
 			this.contLimit = contLimit;
 			this.length = length;
-			this.weather = weather;			
-		}
+			this.weather = weather;	
+			this.limitSpeed = maxSpeed;
+			this.vehicles = new ArrayList<>();
+			this.srcJunc.addOutGoingRoad(this);
+			this.destJunc.addIncommingRoad(this);
 	}
 	
 	public void enter(Vehicle v) {
-		if(v.getLoc() != 0 && v.getActSpeed() != 0)
+		if(v.getLocation() != 0 && v.getSpeed() != 0)
 			throw new IllegalArgumentException("El/Los valores no son validos");
 		vehicles.add(v);
 		//Para ordenar la lista de vehiculos 
@@ -123,26 +126,21 @@ public abstract class Road extends SimulatedObject{
 		
 	@Override
 	void advance(int currTime) {
-		for(int i = 0; i < currTime; i++) {
-			//Reduce la contaminacion total
-			reduceTotalContamination();
-			//Establece el limite de velocidad
-			updateSpeedLimit();
-			//Recorre la lista de vehiculos
-			for(Vehicle e: vehicles) {
-				calculateVehicleSpeed(e);
-				e.advance(currTime);
-			}
-			
-			
-			
-			for(int j = 0; j < vehicles.size(); j++) {
-				//pone la velocidad del vehı́culo
-				vehicles.get(j).setSpeed(calculateVehicleSpeed(vehicles.get(j)));
-				//Llamamos al metodo advance
-				vehicles.get(j).advance(currTime);
-			}
+		//Reduce la contaminacion total
+		reduceTotalContamination();
+		//Establece el limite de velocidad
+		updateSpeedLimit();
+		//Recorre la lista de vehiculos
+		for(Vehicle ve: vehicles) {
+			ve.setSpeed(calculateVehicleSpeed(ve));
+			ve.advance(currTime);
 		}
+		/*for(int j = 0; j < vehicles.size(); j++) {
+			//pone la velocidad del vehı́culo
+			vehicles.get(j).setSpeed(calculateVehicleSpeed(vehicles.get(j)));
+			//Llamamos al metodo advance
+			vehicles.get(j).advance(currTime);
+		}*/
 		//Ordena el array en funcion de la posicion del vehicuo
 		Collections.sort(vehicles, new VehicleComparator());
 	}
@@ -151,9 +149,15 @@ public abstract class Road extends SimulatedObject{
 	public JSONObject report() {
 		JSONObject jo = new JSONObject();
 		jo.put("id", _id);
-		jo.put("speedLimit", maxSpeed);
+		jo.put("speedlimit", limitSpeed);
+		jo.put("weather", weather.toString());
 		jo.put("co2", contT);
-		jo.put("vehicles", vehicles);
+		List<String> vId = new ArrayList<>();
+		for(int i = 0; i < vehicles.size(); i++)
+		{
+			vId.add(vehicles.get(i).getId());
+		}
+		jo.put("vehicles", vId);
 		return jo;
 	}		
 }

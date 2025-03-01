@@ -6,7 +6,7 @@ public class MostCrowdedStrategy implements LightSwitchingStrategy{
 
 	private int ticks;
 	
-	protected MostCrowdedStrategy (int timeSlot) {
+	public MostCrowdedStrategy (int timeSlot) {
 		this.ticks = timeSlot;
 	}
 	
@@ -14,29 +14,42 @@ public class MostCrowdedStrategy implements LightSwitchingStrategy{
 	public int chooseNextGreen(List<Road> roads, List<List<Vehicle>> qs, int currGreen, int lastSwitchingTime, int currTime) {
 		if(roads.size() == 0) return -1;
 		
-		if(currGreen == -1) {
-			int max = -100000;
-			int auxI = 0;
-			for(int i = 0; i < qs.size(); i++) {
-				if(qs.get(i).size() > max) {
-					max = qs.get(i).size();
-					auxI = i;
-				}
-			}
-			return auxI;
-		}
-		
 		if(currTime-lastSwitchingTime < ticks) return currGreen;
 		
-		int i = currGreen+1;
-		int max = qs.get(currGreen).size();
-		int ret = currGreen;
-		while(i != currGreen) {
-			if(qs.get(i).size() > max) {
+		//Si todos los semaforos estan en rojo:
+		int i = 0;
+		int ret = i;
+		int max = qs.get(i).size();
+		if(currGreen == - 1)
+		{
+			while(i < qs.size())
+			{
+				if(qs.get(i).size() > max)
+				{
+					max = qs.get(i).size();
+					ret = i;
+				}
+				i++;
+			}
+			return ret;
+		}
+		
+		//Si nada de lo anterior se cumple se recorre de forma circular
+		//la lista de vehiculos de cada carretera y la que tenga un mayor tamaño 
+		//tendra el semaforo en verde
+		if(currGreen == qs.size() - 1) i = 0;
+		else i = currGreen + 1;
+		ret = i;
+		max = qs.get(i).size();
+		while(i != currGreen)
+		{
+			if(qs.get(i).size() > max)
+			{
 				max = qs.get(i).size();
 				ret = i;
 			}
-			if(i == qs.size()) i = 0; //Por si currGreen no ha empezado en 0
+			if(i == qs.size() - 1) i = 0;
+			else i++;
 		}
 		return ret;
 	}

@@ -23,9 +23,8 @@ public class CityRoad extends Road{
 
 	@Override
 	int calculateVehicleSpeed(Vehicle v) {
-		int s = ((11 - v.getContClass()* getSpeedLimit())/11);
-		v.setSpeed(s);
-		return v.getActSpeed();
+		int s = (((11 - v.getContClass())* getSpeedLimit())/11);
+		return s;
 	}
 
 	
