@@ -1,7 +1,7 @@
 package simulator.model;
 
-public class NewInterCityRoadEvent extends Event{
-	
+public class NewInterCityRoadEvent extends Event {
+
 	int time;
 	String id;
 	String srcJun;
@@ -10,8 +10,9 @@ public class NewInterCityRoadEvent extends Event{
 	int co2Limit;
 	int maxSpeed;
 	Weather weather;
-	
-	public NewInterCityRoadEvent(int time, String id, String srcJun, String destJunc, int length, int co2Limit, int maxSpeed, Weather weather) {
+
+	public NewInterCityRoadEvent(int time, String id, String srcJun, String destJunc, int length, int co2Limit,
+			int maxSpeed, Weather weather) {
 		super(time);
 		this.time = time;
 		this.id = id;
@@ -20,7 +21,7 @@ public class NewInterCityRoadEvent extends Event{
 		this.length = length;
 		this.co2Limit = co2Limit;
 		this.maxSpeed = maxSpeed;
-		this.weather = weather;		
+		this.weather = weather;
 	}
 
 	@Override
@@ -28,6 +29,6 @@ public class NewInterCityRoadEvent extends Event{
 		Junction src = map.getJunction(srcJun);
 		Junction dest = map.getJunction(destJunc);
 		Road r = new InterCityRoad(id, src, dest, maxSpeed, co2Limit, length, weather);
-		map.addRoad(r);		
+		map.addRoad(r);
 	}
 }

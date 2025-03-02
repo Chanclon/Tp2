@@ -17,6 +17,7 @@ public class Vehicle extends SimulatedObject {
 	private int _contClass;
 	private int _contT;
 	private int _distanciaT;
+	private int _localizacionPrev;
 
 	// Getters: ////////////////
 
@@ -93,20 +94,23 @@ public class Vehicle extends SimulatedObject {
 		this._contClass = contClass;
 		this.itinerary = Collections.unmodifiableList(new ArrayList<>(itinerary));
 		this._estado = VehicleStatus.PENDING;
-		this._actSpeed=0;
-		this._contT=0;
-		this._distanciaT=0;
+		this._actSpeed = 0;
+		this._contT = 0;
+		this._distanciaT = 0;
 		this._localizacion = 0;
+		this._localizacionPrev = 0;
 	}
 
+//Se actualiza mal la localizacion y la distancia
 	void advance(int currTime) {
-		if(_estado != VehicleStatus.TRAVELING) return;
+		if (_estado != VehicleStatus.TRAVELING)
+			return;
 		// Se actualiza la localización:
-		int localizacionPrev = this._localizacion;
+		this._localizacionPrev = this._localizacion;
 		this._localizacion = Math.min(_localizacion + _actSpeed, _road.getLength());
 		// Calcular la contaminacion:
-		int I = this._localizacion - localizacionPrev;
-		this._distanciaT = I;
+		int I = this._localizacion - this._localizacionPrev;
+		this._distanciaT += I;
 		this._contT += this._contClass * I;
 		_road.addContamination(this._contClass * I);
 		// Comprobar si se sale de la carretera
@@ -125,28 +129,29 @@ public class Vehicle extends SimulatedObject {
 		if (_road != null && itinerary.indexOf(_road.getSrc()) > 0) {
 			_road.exit(this);
 		}
-		//Si no ha empezado la ruta el coche se inicia en la primera carretera
-		if(_estado == VehicleStatus.PENDING)
-		{
+		// Si no ha empezado la ruta el coche se inicia en la primera carretera
+		if (_estado == VehicleStatus.PENDING) {
 			_road = itinerary.get(0).roadTo(itinerary.get(1));
 			_road.enter(this);
 			_estado = VehicleStatus.TRAVELING;
-			return; 
-			//Si no habria que comprobar si en el if y else de 
-			//despues el estado del vehiculo es Waiting
+			return;
+			// Si no habria que comprobar si en el if y else de
+			// despues el estado del vehiculo es Waiting
 		}
 
-		if (this._road.getDest() == this.itinerary.getLast() /*&& _estado == VehicleStatus.WAITING*/) {
+		if (this._road.getDest() == this.itinerary.getLast() /* && _estado == VehicleStatus.WAITING */) {
 			_estado = VehicleStatus.ARRIVED;
 			this._road = null;
 			this._actSpeed = 0;
 			// Puede que mas cosas
 		}
 
-		else{
-			//La carretera siguiente es la que hay entre el cruce de destino de la carretera actual 
-			//y del siguiente cruce de destino que se obtiene sumando uno al indice del cruce destino de la carretera actual
-			this._road = _road.getDest().roadTo( itinerary.get(itinerary.indexOf(_road.getDest())));
+		else {
+			// La carretera siguiente es la que hay entre el cruce de destino de la
+			// carretera actual
+			// y del siguiente cruce de destino que se obtiene sumando uno al indice del
+			// cruce destino de la carretera actual
+			this._road = _road.getDest().roadTo(itinerary.get(itinerary.indexOf(_road.getDest())));
 			_estado = VehicleStatus.TRAVELING;
 			this._localizacion = 0;
 			_road.enter(this);

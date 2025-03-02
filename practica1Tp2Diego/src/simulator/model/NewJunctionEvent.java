@@ -1,22 +1,23 @@
 package simulator.model;
 
-public class NewJunctionEvent extends Event{
-	
+public class NewJunctionEvent extends Event {
+
 	int time;
 	String id;
 	LightSwitchingStrategy lsStrategy;
 	DequeuingStrategy dqStrategy;
 	int xCoor;
 	int yCoor;
-	
-	public NewJunctionEvent(int time, String id, LightSwitchingStrategy lsStrategy, DequeuingStrategy dqStrategy, int xCoor, int yCoor) {
-		  super(time);
-		  this.time = time;
-		  this.id = id;
-		  this.lsStrategy = lsStrategy;
-		  this.dqStrategy = dqStrategy;
-		  this.xCoor = xCoor;
-		  this.yCoor = yCoor;
+
+	public NewJunctionEvent(int time, String id, LightSwitchingStrategy lsStrategy, DequeuingStrategy dqStrategy,
+			int xCoor, int yCoor) {
+		super(time);
+		this.time = time;
+		this.id = id;
+		this.lsStrategy = lsStrategy;
+		this.dqStrategy = dqStrategy;
+		this.xCoor = xCoor;
+		this.yCoor = yCoor;
 	}
 
 	@Override

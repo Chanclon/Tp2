@@ -14,6 +14,7 @@ import simulator.model.Event;
 
 public class Main {
 
+	private static int _timeLimit ;
 	private static String _inFile = null;
 	private static String _outFile = null;
 	private static Factory<Event> _eventsFactory = null;
