@@ -18,6 +18,24 @@ public abstract class Road extends SimulatedObject {
 	private int contT;
 	private List<Vehicle> vehicles; // Ordenada por la localizacion de los vehiculos (descendente)
 
+	protected Road(String id, Junction srcJunc, Junction destJunc, int maxSpeed, int contLimit, int length,
+			Weather weather) {
+		super(id);
+		if (srcJunc == null || destJunc == null || weather == null || maxSpeed <= 0 || contLimit < 0 || length <= 0) {
+			throw new IllegalArgumentException("El/Los Valores no son validos");
+		}
+		this.srcJunc = srcJunc;
+		this.destJunc = destJunc;
+		this.maxSpeed = maxSpeed;
+		this.contLimit = contLimit;
+		this.length = length;
+		this.weather = weather;
+		this.limitSpeed = maxSpeed;
+		this.vehicles = new ArrayList<>();
+		this.srcJunc.addOutGoingRoad(this);
+		this.destJunc.addIncommingRoad(this);
+	}
+
 	// Getters: /////////////////////
 
 	public int getLength() {
@@ -68,30 +86,7 @@ public abstract class Road extends SimulatedObject {
 		this.limitSpeed = s;
 	}
 
-	/*
-	 * protected void setVehicleSpeed() {
-	 * 
-	 * }
-	 */
 	///////////////////////////////
-
-	protected Road(String id, Junction srcJunc, Junction destJunc, int maxSpeed, int contLimit, int length,
-			Weather weather) {
-		super(id);
-		if (srcJunc == null || destJunc == null || weather == null || maxSpeed <= 0 || contLimit < 0 || length <= 0) {
-			throw new IllegalArgumentException("El/Los Valores no son validos");
-		}
-		this.srcJunc = srcJunc;
-		this.destJunc = destJunc;
-		this.maxSpeed = maxSpeed;
-		this.contLimit = contLimit;
-		this.length = length;
-		this.weather = weather;
-		this.limitSpeed = maxSpeed;
-		this.vehicles = new ArrayList<>();
-		this.srcJunc.addOutGoingRoad(this);
-		this.destJunc.addIncommingRoad(this);
-	}
 
 	public void enter(Vehicle v) {
 		if (v.getLocation() != 0 && v.getSpeed() != 0)
@@ -135,8 +130,10 @@ public abstract class Road extends SimulatedObject {
 		updateSpeedLimit();
 		// Recorre la lista de vehiculos
 		for (Vehicle ve : vehicles) {
-			ve.setSpeed(calculateVehicleSpeed(ve));
-			ve.advance(currTime);
+			if (ve.getStatus() == VehicleStatus.TRAVELING) {
+				ve.setSpeed(calculateVehicleSpeed(ve));
+				ve.advance(currTime);
+			}
 		}
 		/*
 		 * for(int j = 0; j < vehicles.size(); j++) { //pone la velocidad del vehı́culo

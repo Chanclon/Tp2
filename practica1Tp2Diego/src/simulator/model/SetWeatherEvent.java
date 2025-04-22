@@ -27,4 +27,9 @@ public class SetWeatherEvent extends Event {
 			map.getRoad(id).setWeather(w);
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "New Weather '" + time + "'";
+	}
 }

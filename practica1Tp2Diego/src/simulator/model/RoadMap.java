@@ -20,14 +20,11 @@ public class RoadMap {
 
 	protected RoadMap() {
 		this.Junction = new LinkedList<>();
-		;
 		this.road = new ArrayList<>();
 		this.vehicle = new ArrayList<>();
 		this.junctionMap = new HashMap<>();
 		this.roadMap = new HashMap<>();
-		;
 		this.vehicleMap = new HashMap<>();
-		;
 	}
 
 	// Getters: /////////////////////////
@@ -82,25 +79,23 @@ public class RoadMap {
 	}
 
 	public void addVehicle(Vehicle v) {
+
 		if (vehicleMap.containsKey(v.getId()))
 			throw new IllegalArgumentException("ya existe un vehiculo con el mismo id");
-		for (int i = 0; i < v.getItinerary().size(); i++) {
-			if (!junctionMap.containsValue(v.getItinerary().get(i)))
+
+		for (Junction j : v.getItinerary()) {
+			if (!junctionMap.containsValue(j))
 				throw new IllegalArgumentException("El itinerario no es valido");
 		}
 
-		int i = 0;
-		int j = 0;
-		while (i < road.size() && j < v.getItinerary().size() - 1) {
-			if (road.get(i).getSrc().getId().equals(v.getItinerary().get(j).getId())
-					&& road.get(i).getDest().getId().equals(v.getItinerary().get(j + 1).getId())) {
-				j++;
-				i = 0;
-			} else
-				i++;
+		for (int i = 0; i < v.getItinerary().size() - 1; i++) {
+			Junction curr = v.getItinerary().get(i);
+			Junction next = v.getItinerary().get(i + 1);
+
+			if (curr.roadTo(next) == null) {
+				throw new IllegalArgumentException("El itinerario no es válido");
+			}
 		}
-		if (i == road.size())
-			throw new IllegalArgumentException("El itinerario no es valido");
 
 		vehicle.add(v);
 		vehicleMap.put(v.getId(), v);

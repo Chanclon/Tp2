@@ -1,6 +1,7 @@
 package simulator.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class Junction extends SimulatedObject implements LightSwitchingStrategy, DequeuingStrategy {
+public class Junction extends SimulatedObject {
 
 	private List<Road> roads;
 	private List<List<Vehicle>> vehiclesInRoad;
@@ -39,7 +40,35 @@ public class Junction extends SimulatedObject implements LightSwitchingStrategy,
 		this.outRoads = new HashMap<>();
 	}
 
-	// No se si esta bien no entiendo lo del LinkedList
+	// Getters
+	public int getX() {
+		return xCoor;
+	}
+
+	public int getY() {
+		return yCoor;
+	}
+
+	public int getGreenLightIndex() {
+		return currGreen;
+	}
+
+	public List<Road> getInRoads() {
+		return Collections.unmodifiableList(roads);
+	}
+
+	// No se puede pasar la lista directamente porque se podria modificar desde
+	// cualquier sitio,
+	// hy que hacerla inmodificable
+	public Map<Road, List<Vehicle>> getQueue() {
+		Map<Road, List<Vehicle>> newMap = new HashMap<>();
+		for (Road r : vehiclesInRoadMap.keySet()) {
+			newMap.put(r, Collections.unmodifiableList(vehiclesInRoadMap.get(r)));
+		}
+		return newMap;
+	}
+	//
+
 	public void addIncommingRoad(Road r) {
 		if (r.getDest() != this)
 			throw new IllegalArgumentException("La carretera no pertenece l cruce");
@@ -56,10 +85,13 @@ public class Junction extends SimulatedObject implements LightSwitchingStrategy,
 	}
 
 	public void enter(Vehicle v) {
-		if (!roads.contains(v.getRoad()))
+		Road r = v.getRoad();
+		List<Vehicle> q = vehiclesInRoadMap.get(r);
+
+		if (q == null)
 			throw new IllegalArgumentException("La carretera no contiene el vehiculo");
 
-		vehiclesInRoad.get(vehiclesInRoad.indexOf(vehiclesInRoadMap.getOrDefault(v.getRoad(), null))).add(v);
+		q.add(v);
 	}
 
 	public Road roadTo(Junction j) {
@@ -69,28 +101,15 @@ public class Junction extends SimulatedObject implements LightSwitchingStrategy,
 	@Override
 	void advance(int currTime) {
 		if (currGreen != -1) {
-			if (vehiclesInRoad.size() == 0)
-				return;
-			List<Vehicle> v = vehiclesInRoadMap.getOrDefault(vehiclesInRoad.get(currGreen), null);
-			List<Vehicle> l = dqStrategy.dequeue(v);
-			if (l == null)
-				return;
-			for (int i = 0; i < l.size(); i++) {
-				l.get(i).moveToNextRoad();
-				boolean eliminado = false;
-				int j = 0;
-				while (!eliminado || j < v.size()) {
-					if (l.get(i) == v.get(j)) {
-						v.remove(j);
-						eliminado = true;
-					}
-					j++;
-				}
+			List<Vehicle> q = vehiclesInRoad.get(currGreen);
+			for (Vehicle v : dqStrategy.dequeue(q)) {
+				v.moveToNextRoad();
+				q.remove(v);
 			}
 		}
 		int newGreen = lsStrategy.chooseNextGreen(roads, vehiclesInRoad, currGreen, prevGreen, currTime);
 		if (newGreen != currGreen) {
-			prevGreen = currGreen;
+			prevGreen = currTime;
 			currGreen = newGreen;
 		}
 	}
@@ -124,37 +143,5 @@ public class Junction extends SimulatedObject implements LightSwitchingStrategy,
 		jo.put("queues", queuesArray);
 
 		return jo;
-
-		/*
-		 * JSONObject jo = new JSONObject(); jo.put("id", _id); if(outRoads.size() == 0
-		 * && currGreen >= outRoads.size() - 1) jo.put("green", "none"); jo.put("green",
-		 * currGreen); if(jo.isNull("queues") && jo.getJSONObject("queues").isEmpty())
-		 * jo.put("queues", "[]"); else { JSONArray queues = jo.getJSONArray("queues");
-		 * 
-		 * JSONArray vehicles = jo.getJSONArray("vehicles"); List<List<String>> v = new
-		 * ArrayList<>(); List<String> vId = new ArrayList<>(); for(int j = 0; j <
-		 * vehicles.length(); j++) { JSONObject vObject = queues.getJSONObject(j);
-		 * vId.add(vObject.getString("vehicles")); } v.add(vId);
-		 * 
-		 * ArrayList<String> r = new ArrayList<>(); for(int i = 0; i < queues.length();
-		 * i++) { JSONObject q = queues.getJSONObject(i); r.add(q.getString("road")); }
-		 * 
-		 * JSONObject q = new JSONObject(); q.put("road", r); q.put("vehicles", v);
-		 * jo.put("queues", q); } return jo;
-		 */
 	}
-
-	@Override
-	public List<Vehicle> dequeue(List<Vehicle> q) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int chooseNextGreen(List<Road> roads, List<List<Vehicle>> qs, int currGreen, int lastSwitchingTime,
-			int currTime) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
 }

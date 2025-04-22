@@ -10,6 +10,7 @@ import org.json.JSONTokener;
 
 import simulator.factories.Factory;
 import simulator.model.Event;
+import simulator.model.TrafficSimObserver;
 import simulator.model.TrafficSimulator;
 
 public class Controller {
@@ -37,7 +38,7 @@ public class Controller {
 		// print "{" to 'p'
 		p.println("{");
 		// print " \"states\": [" to 'p'
-		p.println("[");
+		p.println("	\"states\": [");
 
 		// loop for the first n-1 states (to print comma after each state)
 		for (int i = 0; i < n - 1; i++) {
@@ -60,5 +61,23 @@ public class Controller {
 
 	public void reset() {
 		_sim.reset();
+	}
+
+	public void addObserver(TrafficSimObserver o) {
+		_sim.addObserver(o);
+	}
+
+	public void removeObserver(TrafficSimObserver o) {
+		_sim.removeObserver(o);
+	}
+
+	public void addEvent(Event e) {
+		_sim.addEvent(e);
+	}
+
+	public void run(int n) {
+		for (int i = 0; i < n; i++) {
+			_sim.advance();
+		}
 	}
 }

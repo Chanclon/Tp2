@@ -9,6 +9,7 @@ import org.json.JSONObject;
 public class Vehicle extends SimulatedObject {
 
 	private List<Junction> itinerary;
+	private int _lastJunctSeen;
 	private int maxSpeed;
 	private int _actSpeed;
 	private VehicleStatus _estado;
@@ -18,6 +19,30 @@ public class Vehicle extends SimulatedObject {
 	private int _contT;
 	private int _distanciaT;
 	private int _localizacionPrev;
+
+	public Vehicle(String id, int maxSpeed, int contClass, List<Junction> itinerary) {
+		super(id);
+		if (maxSpeed <= 0) {
+			throw new IllegalArgumentException("La velocidad no puede ser ni negativa ni 0");
+		}
+		if (contClass > 10 || contClass < 0) {
+			throw new IllegalArgumentException("La contaminacion no esta entre 0 y 10");
+		}
+		if (itinerary.size() < 2 || itinerary == null) {
+			throw new IllegalArgumentException("Tiene que haber mas de dos cruces");
+		}
+
+		this.maxSpeed = maxSpeed;
+		this._contClass = contClass;
+		this.itinerary = Collections.unmodifiableList(new ArrayList<>(itinerary));
+		this._estado = VehicleStatus.PENDING;
+		this._actSpeed = 0;
+		this._contT = 0;
+		this._distanciaT = 0;
+		this._localizacion = 0;
+		this._localizacionPrev = 0;
+		this._lastJunctSeen = 0;
+	}
 
 	// Getters: ////////////////
 
@@ -53,6 +78,10 @@ public class Vehicle extends SimulatedObject {
 		return this._road;
 	}
 
+	public int getDistanciaT() {
+		return this._distanciaT;
+	}
+
 	//////////////////////////
 
 	// Setters: ///////////////
@@ -78,29 +107,6 @@ public class Vehicle extends SimulatedObject {
 
 	//////////////////////////
 
-	public Vehicle(String id, int maxSpeed, int contClass, List<Junction> itinerary) {
-		super(id);
-		if (maxSpeed <= 0) {
-			throw new IllegalArgumentException("La velocidad no puede ser ni negativa ni 0");
-		}
-		if (contClass > 10 || contClass < 0) {
-			throw new IllegalArgumentException("La contaminacion no esta entre 0 y 10");
-		}
-		if (itinerary.size() < 2) {
-			throw new IllegalArgumentException("Tiene que haber mas de dos cruces");
-		}
-
-		this.maxSpeed = maxSpeed;
-		this._contClass = contClass;
-		this.itinerary = Collections.unmodifiableList(new ArrayList<>(itinerary));
-		this._estado = VehicleStatus.PENDING;
-		this._actSpeed = 0;
-		this._contT = 0;
-		this._distanciaT = 0;
-		this._localizacion = 0;
-		this._localizacionPrev = 0;
-	}
-
 //Se actualiza mal la localizacion y la distancia
 	void advance(int currTime) {
 		if (_estado != VehicleStatus.TRAVELING)
@@ -119,6 +125,7 @@ public class Vehicle extends SimulatedObject {
 			_road.getDest().enter(this);
 			_estado = VehicleStatus.WAITING;
 			_actSpeed = 0;
+			_lastJunctSeen++;
 		}
 	}
 
@@ -126,34 +133,20 @@ public class Vehicle extends SimulatedObject {
 		if (_estado != VehicleStatus.PENDING && _estado != VehicleStatus.WAITING)
 			throw new IllegalArgumentException("El coche tiene que estar parado");
 
-		if (_road != null && itinerary.indexOf(_road.getSrc()) > 0) {
+		// Si existe una carretera
+		if (_road != null) {
 			_road.exit(this);
 		}
-		// Si no ha empezado la ruta el coche se inicia en la primera carretera
-		if (_estado == VehicleStatus.PENDING) {
-			_road = itinerary.get(0).roadTo(itinerary.get(1));
-			_road.enter(this);
-			_estado = VehicleStatus.TRAVELING;
-			return;
-			// Si no habria que comprobar si en el if y else de
-			// despues el estado del vehiculo es Waiting
-		}
 
-		if (this._road.getDest() == this.itinerary.getLast() /* && _estado == VehicleStatus.WAITING */) {
+		// Siguiente carretera
+		if (_lastJunctSeen == itinerary.size() - 1) {
 			_estado = VehicleStatus.ARRIVED;
-			this._road = null;
-			this._actSpeed = 0;
-			// Puede que mas cosas
-		}
-
-		else {
-			// La carretera siguiente es la que hay entre el cruce de destino de la
-			// carretera actual
-			// y del siguiente cruce de destino que se obtiene sumando uno al indice del
-			// cruce destino de la carretera actual
-			this._road = _road.getDest().roadTo(itinerary.get(itinerary.indexOf(_road.getDest())));
+			_road = null;
+			_localizacion = 0;
+		} else {
 			_estado = VehicleStatus.TRAVELING;
-			this._localizacion = 0;
+			_road = itinerary.get(_lastJunctSeen).roadTo(itinerary.get(_lastJunctSeen + 1));
+			_localizacion = 0;
 			_road.enter(this);
 		}
 	}

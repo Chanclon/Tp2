@@ -27,4 +27,9 @@ public class SetContClassEvent extends Event {
 			map.getVehicle(id).setContClass(c);
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "New Contanimation Class '" + time + "'";
+	}
 }
